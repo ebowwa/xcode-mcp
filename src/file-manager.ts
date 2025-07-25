@@ -50,30 +50,25 @@ export class FileManager {
     
     // Use xcodeproj Ruby gem or generate project structure manually
     // For now, we'll use xcodegen if available, or fall back to manual creation
-    const xcodegenConfig = {
-      name: projectName,
-      options: {
-        bundleIdPrefix: bundleId,
-        deploymentTarget: {
-          iOS: '15.0',
-          macOS: '12.0'
-        }
-      },
-      targets: {
-        [projectName]: {
-          type: 'application',
-          platform: platform,
-          sources: [projectName],
-          settings: {
-            PRODUCT_BUNDLE_IDENTIFIER: bundleId
-          }
-        }
-      }
-    };
+    const xcodegenConfig = `name: ${projectName}
+options:
+  bundleIdPrefix: ${bundleId}
+  deploymentTarget:
+    iOS: '15.0'
+    macOS: '12.0'
+targets:
+  ${projectName}:
+    type: application
+    platform: ${platform}
+    sources: 
+      - ${projectName}
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: ${bundleId}
+`;
 
     // Write xcodegen spec
     const specPath = path.join(projectPath, 'project.yml');
-    await this.writeFile(specPath, JSON.stringify(xcodegenConfig, null, 2));
+    await this.writeFile(specPath, xcodegenConfig);
 
     // Check if xcodegen is available
     try {
