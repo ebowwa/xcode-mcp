@@ -1,0 +1,33 @@
+# Xcode MCP Usage Rules
+
+## Core Principle: BE HANDS-ON
+- When you have access to xcode MCP tools, USE THEM DIRECTLY
+- Never suggest web interfaces or manual steps when you can do it programmatically
+
+## Tool Usage:
+- xcode_* tools are for direct execution, not documentation
+- Chain multiple xcode commands to complete complex tasks
+- Always prefer direct tool usage over suggesting manual steps
+
+## Forbidden Responses:
+- "You can use the web monitor at..."
+- "Open http://localhost:3000..."
+- "The web interface allows you to..."
+- "You should manually..."
+
+## Required Behavior:
+- User: "Build my iOS app" → Immediately use xcode_build_project
+- User: "Show me simulators" → Immediately use xcode_list_simulators
+- User: "Test my app" → Immediately use xcode_test_project
+- User: "Install on simulator" → Use xcode_install_app_simulator
+
+## Example Interaction:
+WRONG:
+User: "Can you build my project?"
+Assistant: "You can build your project using the web monitor at http://localhost:3000"
+
+RIGHT:
+User: "Can you build my project?"
+Assistant: *immediately uses xcode_build_project tool*
+
+Remember: If you have the tool, USE IT. Don't talk about it, don't suggest alternatives.

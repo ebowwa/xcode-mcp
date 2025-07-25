@@ -1,0 +1,408 @@
+{
+  "xcode_commands": {
+    "list_simulators": {
+      "name": "list_simulators",
+      "description": "List all available iOS, watchOS, and tvOS simulators",
+      "command": "xcrun simctl list devices",
+      "output_format": "text",
+      "category": "simulator",
+      "platforms": ["ios", "watchos", "tvos"]
+    },
+    "list_available_simulators": {
+      "name": "list_available_simulators", 
+      "description": "List only available (not shutdown) simulators",
+      "command": "xcrun simctl list devices available",
+      "output_format": "text",
+      "category": "simulator"
+    },
+    "list_simulators_json": {
+      "name": "list_simulators_json",
+      "description": "List simulators in JSON format for parsing",
+      "command": "xcrun simctl list devices --json",
+      "output_format": "json",
+      "category": "simulator"
+    },
+    "boot_simulator": {
+      "name": "boot_simulator",
+      "description": "Boot a specific simulator by device ID",
+      "command": "xcrun simctl boot \"{device_id}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Simulator device ID or name"
+        }
+      },
+      "category": "simulator"
+    },
+    "shutdown_simulator": {
+      "name": "shutdown_simulator", 
+      "description": "Shutdown a specific simulator",
+      "command": "xcrun simctl shutdown \"{device_id}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Simulator device ID or 'all'"
+        }
+      },
+      "category": "simulator"
+    },
+    "erase_simulator": {
+      "name": "erase_simulator",
+      "description": "Erase simulator data and settings",
+      "command": "xcrun simctl erase \"{device_id}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string", 
+          "required": true,
+          "description": "Simulator device ID"
+        }
+      },
+      "category": "simulator"
+    },
+    "list_schemes": {
+      "name": "list_schemes",
+      "description": "List available schemes in an Xcode project",
+      "command": "xcodebuild -project \"{project_path}\" -list",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        }
+      },
+      "output_format": "text",
+      "category": "project"
+    },
+    "list_workspace_schemes": {
+      "name": "list_workspace_schemes",
+      "description": "List schemes in an Xcode workspace",  
+      "command": "xcodebuild -workspace \"{workspace_path}\" -list",
+      "parameters": {
+        "workspace_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcworkspace file"
+        }
+      },
+      "category": "project"
+    },
+    "build_project": {
+      "name": "build_project",
+      "description": "Build an Xcode project with specific scheme and configuration",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" -configuration \"{configuration}\" {destination} build",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string",
+          "required": true,
+          "description": "Build scheme name"
+        },
+        "configuration": {
+          "type": "string",
+          "required": false,
+          "default": "Debug",
+          "description": "Build configuration (Debug/Release)"
+        },
+        "destination": {
+          "type": "string",
+          "required": false,
+          "description": "Build destination (-destination flag)",
+          "template": "-destination \"{destination}\""
+        }
+      },
+      "category": "build"
+    },
+    "test_project": {
+      "name": "test_project",
+      "description": "Run tests for an Xcode project",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" {destination} test",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string", 
+          "required": true,
+          "description": "Test scheme name"
+        },
+        "destination": {
+          "type": "string",
+          "required": false,
+          "description": "Test destination",
+          "template": "-destination \"{destination}\""
+        }
+      },
+      "category": "test"
+    },
+    "clean_project": {
+      "name": "clean_project",
+      "description": "Clean build artifacts for an Xcode project",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" clean",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string",
+          "required": false,
+          "description": "Scheme to clean"
+        }
+      },
+      "category": "build"
+    },
+    "archive_project": {
+      "name": "archive_project", 
+      "description": "Create an archive for distribution",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" -configuration Release -archivePath \"{archive_path}\" archive",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string",
+          "required": true,
+          "description": "Scheme to archive"
+        },
+        "archive_path": {
+          "type": "string",
+          "required": true,
+          "description": "Output path for .xcarchive"
+        }
+      },
+      "category": "distribution"
+    },
+    "show_build_settings": {
+      "name": "show_build_settings",
+      "description": "Show build settings for a project/scheme",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" -showBuildSettings",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string",
+          "required": true,
+          "description": "Scheme name"
+        }
+      },
+      "category": "project"
+    },
+    "install_app_simulator": {
+      "name": "install_app_simulator",
+      "description": "Install an app on a simulator",
+      "command": "xcrun simctl install \"{device_id}\" \"{app_path}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Simulator device ID"
+        },
+        "app_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .app bundle"
+        }
+      },
+      "category": "simulator"
+    },
+    "launch_app_simulator": {
+      "name": "launch_app_simulator",
+      "description": "Launch an app on a simulator",
+      "command": "xcrun simctl launch \"{device_id}\" \"{bundle_id}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Simulator device ID"
+        },
+        "bundle_id": {
+          "type": "string",
+          "required": true,
+          "description": "App bundle identifier"
+        }
+      },
+      "category": "simulator"
+    },
+    "capture_screenshot": {
+      "name": "capture_screenshot",
+      "description": "Capture screenshot from simulator",
+      "command": "xcrun simctl io \"{device_id}\" screenshot \"{output_path}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Simulator device ID"
+        },
+        "output_path": {
+          "type": "string",
+          "required": true,
+          "description": "Screenshot output path"
+        }
+      },
+      "category": "simulator"
+    },
+    "show_sdk_info": {
+      "name": "show_sdk_info",
+      "description": "Show available SDKs and their paths",
+      "command": "xcodebuild -showsdks",
+      "output_format": "text",
+      "category": "info"
+    },
+    "show_destinations": {
+      "name": "show_destinations", 
+      "description": "Show available destinations for a scheme",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" -showdestinations",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string",
+          "required": true,
+          "description": "Scheme name"
+        }
+      },
+      "category": "project"
+    },
+    "create_swift_file": {
+      "name": "create_swift_file",
+      "description": "Create a new Swift source file with content",
+      "command": "internal:file_write",
+      "parameters": {
+        "file_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path where the Swift file should be created"
+        },
+        "content": {
+          "type": "string",
+          "required": true,
+          "description": "Swift code content for the file"
+        }
+      },
+      "category": "file_management"
+    },
+    "create_project": {
+      "name": "create_project",
+      "description": "Create a new Xcode project with basic structure",
+      "command": "internal:create_project",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path where the project should be created"
+        },
+        "project_name": {
+          "type": "string",
+          "required": true,
+          "description": "Name of the project"
+        },
+        "bundle_id": {
+          "type": "string",
+          "required": true,
+          "description": "Bundle identifier (e.g., com.company.app)"
+        },
+        "platform": {
+          "type": "string",
+          "required": false,
+          "default": "ios",
+          "description": "Target platform (ios/macos)"
+        }
+      },
+      "category": "project"
+    },
+    "modify_plist": {
+      "name": "modify_plist",
+      "description": "Modify a value in a plist file",
+      "command": "internal:modify_plist",
+      "parameters": {
+        "plist_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to the plist file"
+        },
+        "key": {
+          "type": "string",
+          "required": true,
+          "description": "Plist key to modify"
+        },
+        "value": {
+          "type": "string",
+          "required": true,
+          "description": "New value for the key"
+        }
+      },
+      "category": "file_management"
+    },
+    "add_plist_entry": {
+      "name": "add_plist_entry",
+      "description": "Add a new entry to a plist file",
+      "command": "internal:add_plist_entry",
+      "parameters": {
+        "plist_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to the plist file"
+        },
+        "key": {
+          "type": "string",
+          "required": true,
+          "description": "Plist key to add"
+        },
+        "type": {
+          "type": "string",
+          "required": true,
+          "description": "Value type (string, bool, integer, array, dict)"
+        },
+        "value": {
+          "type": "string",
+          "required": true,
+          "description": "Value to add"
+        }
+      },
+      "category": "file_management"
+    },
+    "create_directory": {
+      "name": "create_directory",
+      "description": "Create a directory with subdirectories if needed",
+      "command": "internal:create_directory",
+      "parameters": {
+        "path": {
+          "type": "string",
+          "required": true,
+          "description": "Directory path to create"
+        }
+      },
+      "category": "file_management"
+    },
+    "read_file": {
+      "name": "read_file",
+      "description": "Read contents of a file",
+      "command": "internal:read_file",
+      "parameters": {
+        "file_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to the file to read"
+        }
+      },
+      "category": "file_management"
+    }
+  }
+}
