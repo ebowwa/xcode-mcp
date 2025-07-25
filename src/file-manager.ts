@@ -66,6 +66,10 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: ${bundleId}
 `;
 
+    // Create source directory for xcodegen
+    const sourcesDir = path.join(projectPath, projectName);
+    await this.createDirectory(sourcesDir);
+    
     // Write xcodegen spec
     const specPath = path.join(projectPath, 'project.yml');
     await this.writeFile(specPath, xcodegenConfig);
@@ -75,10 +79,23 @@ targets:
       await execAsync('which xcodegen');
       // Generate project using xcodegen
       await execAsync(`cd "${projectPath}" && xcodegen generate`);
+      
+      // Create basic Swift files in the source directory
+      await this.createBasicSwiftFiles(sourcesDir, projectName, platform);
     } catch {
       // Fallback: create basic structure manually
       await this.createBasicProjectStructure(projectPath, projectName, bundleId, platform);
     }
+  }
+
+  private async createBasicSwiftFiles(sourcesDir: string, projectName: string, platform: string): Promise<void> {
+    // Create a basic Swift file
+    const appContent = platform === 'ios' ? this.getIOSAppTemplate(projectName) : this.getMacOSAppTemplate(projectName);
+    await this.writeFile(path.join(sourcesDir, `${projectName}App.swift`), appContent);
+    
+    // Create a basic ContentView
+    const contentViewContent = this.getContentViewTemplate();
+    await this.writeFile(path.join(sourcesDir, 'ContentView.swift'), contentViewContent);
   }
 
   private async createBasicProjectStructure(projectPath: string, projectName: string, bundleId: string, platform: string): Promise<void> {
