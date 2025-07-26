@@ -6,6 +6,10 @@
 
 A comprehensive MCP server that provides programmatic access to Xcode functionality, enabling AI assistants like Claude to create, build, test, and manage iOS/macOS projects directly.
 
+<a href="https://glama.ai/mcp/servers/@ebowwa/xcode-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@ebowwa/xcode-mcp/badge" alt="Xcode Server MCP server" />
+</a>
+
 ## 🚀 Features
 
 ### Project Management
