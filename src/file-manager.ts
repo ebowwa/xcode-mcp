@@ -12,6 +12,25 @@ export class FileManager {
     await fs.writeFile(filePath, content, 'utf-8');
   }
 
+  async getDefaultDevelopmentTeam(): Promise<string | null> {
+    try {
+      const { stdout } = await execAsync('defaults read com.apple.dt.Xcode IDEProvisioningTeamManagerLastSelectedTeamID 2>/dev/null');
+      return stdout.trim();
+    } catch {
+      return null;
+    }
+  }
+
+  async getSigningCertificate(): Promise<string | null> {
+    try {
+      const { stdout } = await execAsync('security find-identity -v -p codesigning | grep "Apple Development" | head -1');
+      const match = stdout.match(/"([^"]+)"/);
+      return match ? match[1] : null;
+    } catch {
+      return null;
+    }
+  }
+
   async readFile(filePath: string): Promise<string> {
     return await fs.readFile(filePath, 'utf-8');
   }
@@ -44,13 +63,11 @@ export class FileManager {
     await execAsync(command);
   }
 
-  async createXcodeProject(projectPath: string, projectName: string, bundleId: string, platform: string = 'ios'): Promise<void> {
-    // Create project directory
-    await this.createDirectory(projectPath);
+  private async generateXcodegenConfig(projectName: string, bundleId: string, platform: string): Promise<string> {
+    const xcodegenPlatform = platform === 'ios' ? 'iOS' : platform === 'macos' ? 'macOS' : platform;
+    const teamId = await this.getDefaultDevelopmentTeam();
     
-    // Use xcodeproj Ruby gem or generate project structure manually
-    // For now, we'll use xcodegen if available, or fall back to manual creation
-    const xcodegenConfig = `name: ${projectName}
+    let config = `name: ${projectName}
 options:
   bundleIdPrefix: ${bundleId}
   deploymentTarget:
@@ -59,16 +76,31 @@ options:
 targets:
   ${projectName}:
     type: application
-    platform: ${platform}
+    platform: ${xcodegenPlatform}
     sources: 
       - ${projectName}
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: ${bundleId}
-`;
+      PRODUCT_BUNDLE_IDENTIFIER: ${bundleId}`;
+    
+    if (teamId) {
+      config += `
+      DEVELOPMENT_TEAM: ${teamId}
+      CODE_SIGN_STYLE: Automatic`;
+    }
+    
+    return config + '\n';
+  }
 
-    // Create source directory for xcodegen
+  async createXcodeProject(projectPath: string, projectName: string, bundleId: string, platform: string = 'ios'): Promise<void> {
+    // Create project directory
+    await this.createDirectory(projectPath);
+    
+    // Create source directory for xcodegen (must exist before generation)
     const sourcesDir = path.join(projectPath, projectName);
     await this.createDirectory(sourcesDir);
+    
+    // Generate xcodegen config with automatic team detection
+    const xcodegenConfig = await this.generateXcodegenConfig(projectName, bundleId, platform);
     
     // Write xcodegen spec
     const specPath = path.join(projectPath, 'project.yml');
@@ -77,12 +109,22 @@ targets:
     // Check if xcodegen is available
     try {
       await execAsync('which xcodegen');
-      // Generate project using xcodegen
-      await execAsync(`cd "${projectPath}" && xcodegen generate`);
       
-      // Create basic Swift files in the source directory
+      // Create basic Swift files BEFORE running xcodegen
       await this.createBasicSwiftFiles(sourcesDir, projectName, platform);
-    } catch {
+      
+      // Generate project using xcodegen
+      const { stdout, stderr } = await execAsync(`cd "${projectPath}" && xcodegen generate 2>&1`);
+      console.log('xcodegen output:', stdout);
+      if (stderr) console.error('xcodegen stderr:', stderr);
+      
+      // Check if .xcodeproj was created
+      const xcodeprojPath = path.join(projectPath, `${projectName}.xcodeproj`);
+      if (!await this.fileExists(xcodeprojPath)) {
+        throw new Error('xcodegen did not create .xcodeproj file');
+      }
+    } catch (error) {
+      console.error('xcodegen failed:', error);
       // Fallback: create basic structure manually
       await this.createBasicProjectStructure(projectPath, projectName, bundleId, platform);
     }

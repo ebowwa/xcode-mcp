@@ -88,9 +88,18 @@ export class CommandExecutor {
     // Replace required parameters
     if (command.parameters) {
       for (const [paramName, paramDef] of Object.entries(command.parameters)) {
-        const value = args[paramName] || paramDef.default;
+        const value = args[paramName] !== undefined ? args[paramName] : paramDef.default;
         
-        if (value !== undefined && value !== null && value !== '') {
+        if (paramDef.type === 'boolean') {
+          // Handle boolean parameters
+          if (value === true) {
+            // Replace placeholder with the template if true
+            builtCommand = builtCommand.replace(`{${paramName}}`, paramDef.template || '');
+          } else {
+            // Remove placeholder if false
+            builtCommand = builtCommand.replace(`{${paramName}}`, '');
+          }
+        } else if (value !== undefined && value !== null && value !== '') {
           if (paramDef.template) {
             // Use custom template for parameter
             const paramValue = paramDef.template.replace(`{${paramName}}`, value);
@@ -196,6 +205,18 @@ export class CommandExecutor {
           
         case 'read_file':
           output = await this.fileManager.readFile(args.file_path);
+          break;
+          
+        case 'build_with_auto_team':
+          // Dynamically detect team and build
+          const teamId = await this.fileManager.getDefaultDevelopmentTeam();
+          const teamFlag = teamId ? `DEVELOPMENT_TEAM=${teamId}` : '';
+          
+          const buildCommand = `xcodebuild -project "${args.project_path}" -scheme "${args.scheme}" -destination "id=${args.device_id}" ${teamFlag} -allowProvisioningUpdates -allowProvisioningDeviceRegistration build`;
+          
+          const { stdout, stderr } = await execAsync(buildCommand);
+          output = stdout;
+          if (stderr) output += `\n\nWarnings/Errors:\n${stderr}`;
           break;
           
         default:

@@ -91,7 +91,7 @@
     "build_project": {
       "name": "build_project",
       "description": "Build an Xcode project with specific scheme and configuration",
-      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" -configuration \"{configuration}\" {destination} build",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" -configuration \"{configuration}\" {destination} {allow_provisioning} build",
       "parameters": {
         "project_path": {
           "type": "string",
@@ -114,6 +114,13 @@
           "required": false,
           "description": "Build destination (-destination flag)",
           "template": "-destination \"{destination}\""
+        },
+        "allow_provisioning": {
+          "type": "boolean",
+          "required": false,
+          "default": true,
+          "description": "Allow automatic provisioning updates",
+          "template": "-allowProvisioningUpdates"
         }
       },
       "category": "build"
@@ -403,6 +410,108 @@
         }
       },
       "category": "file_management"
+    },
+    "list_physical_devices": {
+      "name": "list_physical_devices",
+      "description": "List all connected physical iOS devices",
+      "command": "xcrun devicectl list devices",
+      "output_format": "text",
+      "category": "device"
+    },
+    "list_device_pairs": {
+      "name": "list_device_pairs",
+      "description": "List paired devices (iOS devices paired with Mac)",
+      "command": "xcrun devicectl list devicepairs",
+      "output_format": "text",
+      "category": "device"
+    },
+    "device_info": {
+      "name": "device_info",
+      "description": "Get detailed information about a specific device",
+      "command": "xcrun devicectl device info --device \"{device_id}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Device identifier (UUID)"
+        }
+      },
+      "category": "device"
+    },
+    "install_app_device": {
+      "name": "install_app_device",
+      "description": "Install an app on a physical device",
+      "command": "xcrun devicectl device install app --device \"{device_id}\" \"{app_path}\"",
+      "parameters": {
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Device identifier (UUID)"
+        },
+        "app_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .app bundle or .ipa file"
+        }
+      },
+      "category": "device"
+    },
+    "build_for_device": {
+      "name": "build_for_device",
+      "description": "Build project specifically for physical device with automatic signing",
+      "command": "internal:build_with_auto_team",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string",
+          "required": true,
+          "description": "Build scheme name"
+        },
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Physical device UUID from list_physical_devices"
+        }
+      },
+      "category": "device"
+    },
+    "run_on_device": {
+      "name": "run_on_device",
+      "description": "Build and run app on physical device",
+      "command": "xcodebuild -project \"{project_path}\" -scheme \"{scheme}\" -destination \"id={device_id}\" -allowProvisioningUpdates -allowProvisioningDeviceRegistration -derivedDataPath \"{derived_path}\" build && xcrun devicectl device install app --device \"{device_id}\" \"{derived_path}/Build/Products/Debug-iphoneos/{scheme}.app\" && xcrun devicectl device process launch --device \"{device_id}\" --start-stopped \"{bundle_id}\"",
+      "parameters": {
+        "project_path": {
+          "type": "string",
+          "required": true,
+          "description": "Path to .xcodeproj file"
+        },
+        "scheme": {
+          "type": "string",
+          "required": true,
+          "description": "Build scheme name"
+        },
+        "device_id": {
+          "type": "string",
+          "required": true,
+          "description": "Physical device UUID"
+        },
+        "bundle_id": {
+          "type": "string",
+          "required": true,
+          "description": "App bundle identifier"
+        },
+        "derived_path": {
+          "type": "string",
+          "required": false,
+          "default": "./DerivedData",
+          "description": "Path for build products"
+        }
+      },
+      "category": "device"
     }
   }
 }
