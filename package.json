@@ -1,29 +1,53 @@
 {
-  "name": "xcode-mcp-server",
-  "version": "1.0.0",
-  "description": "MCP Server for Xcode integration - USE TOOLS DIRECTLY, NO WEB MONITOR SUGGESTIONS",
-  "main": "dist/index.js",
+  "name": "@ebowwa/mcp-xcode",
+  "version": "1.0.1",
+  "description": "Xcode MCP server - build, test, run, and manage simulators from Claude Code",
   "type": "module",
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
-    "web": "node dist/web-server.js",
-    "web:dev": "tsx src/web-server.ts"
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "xcode-mcp": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target node && chmod +x dist/index.js",
+    "dev": "bun run src/index.ts",
+    "watch": "bun build src/index.ts --outdir dist --target node --watch",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "mcp",
+    "xcode",
+    "xcodebuild",
+    "simulator",
+    "ios",
+    "macos",
+    "claude",
+    "apple"
+  ],
+  "author": "ebowwa",
+  "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.5.0",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "tsx": "^4.0.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.0.0"
   },
-  "bin": {
-    "xcode-mcp-server": "dist/index.js"
+  "peerDependencies": {
+    "bun": ">=1.0.0"
+  },
+  "ownership": {
+    "domain": "mcp",
+    "responsibilities": [
+      "xcode-mcp",
+      "ios-development",
+      "simulator-management",
+      "xcodebuild-automation"
+    ]
   }
 }
